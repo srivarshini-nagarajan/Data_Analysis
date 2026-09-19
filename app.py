@@ -25,8 +25,7 @@ st.write(
 )
 # 4. LOAD DATA
 FILE_PATH = (
-    r"C:\Users\DELL\Desktop\project"
-    r"\ecommerce_sales_customer_analytics_.csv"
+    "ecommerce_sales_customer_analytics_.csv"
 )
 @st.cache_data
 def load_data():
