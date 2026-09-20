@@ -25,7 +25,7 @@ st.write(
 )
 # 4. LOAD DATA
 FILE_PATH = (
-"ecommerce_sales_customer_analytics_.csv"
+"data.csv"
 )
 @st.cache_data
 def load_data():
