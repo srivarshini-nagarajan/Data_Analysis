@@ -1,3 +1,4 @@
+# E-COMMERCE SALES & CUSTOMER ANALYTICS DASHBOARD
 # 1. IMPORT LIBRARIES
 import streamlit as st
 import pandas as pd
@@ -18,15 +19,12 @@ st.set_page_config(
 )
 # 3. TITLE
 st.title("🛒 E-Commerce Sales & Customer Analytics Dashboard")
-
 st.write(
     "This dashboard provides an easy-to-understand view of "
     "sales, customers, orders, profits and repeat customers."
 )
 # 4. LOAD DATA
-FILE_PATH = (
-"data.csv"
-)
+FILE_PATH = "data.csv"
 @st.cache_data
 def load_data():
     data = pd.read_csv(FILE_PATH)
@@ -35,7 +33,6 @@ def load_data():
     return data
 data = load_data()
 # 5. BASIC DATA CLEANING
-# Convert important numeric columns into numbers
 numeric_columns = [
     "customer_age",
     "delivery_days",
@@ -57,26 +54,14 @@ numeric_columns = [
     "is_repeat_customer"
 ]
 for column in numeric_columns:
+
     if column in data.columns:
+
         data[column] = pd.to_numeric(
             data[column],
             errors="coerce"
         )
-# 6. FIND DEVICE TYPE COLUMN
-# The current CSV may not contain a device column.
-# This code checks several possible column names.
-device_column = None
-possible_device_columns = [
-    "device_type",
-    "device",
-    "customer_device",
-    "deviceType"
-]
-for column in possible_device_columns:
-    if column in data.columns:
-        device_column = column
-        break
-# 7. SIDEBAR FILTERS
+# 6. SIDEBAR FILTERS
 st.sidebar.header("🔎 Dashboard Filters")
 # Country Filter
 if "customer_country" in data.columns:
@@ -110,25 +95,6 @@ if "customer_city" in data.columns:
     )
 else:
     selected_city = []
-# Device Type Filter
-if device_column is not None:
-    device_options = sorted(
-        data[device_column]
-        .dropna()
-        .astype(str)
-        .unique()
-        .tolist()
-    )
-    selected_device = st.sidebar.multiselect(
-        "📱 Device Type",
-        options=device_options,
-        default=device_options
-    )
-else:
-    st.sidebar.info(
-        "Device Type column was not found in the CSV."
-    )
-    selected_device = []
 # Region Filter
 if "region" in data.columns:
     region_options = sorted(
@@ -225,7 +191,7 @@ if "customer_rating" in data.columns:
     )
 else:
     selected_rating = (0, 0)
-# 8. APPLY FILTERS
+# 7. APPLY FILTERS
 filtered_data = data.copy()
 # Country
 if "customer_country" in filtered_data.columns:
@@ -240,13 +206,6 @@ if "customer_city" in filtered_data.columns:
         filtered_data["customer_city"]
         .astype(str)
         .isin(selected_city)
-    ]
-# Device
-if device_column is not None:
-    filtered_data = filtered_data[
-        filtered_data[device_column]
-        .astype(str)
-        .isin(selected_device)
     ]
 # Region
 if "region" in filtered_data.columns:
@@ -293,7 +252,7 @@ if "customer_rating" in filtered_data.columns:
             selected_rating[1]
         )
     ]
-# 9. CHECK FILTERED DATA
+# 8. CHECK FILTERED DATA
 if filtered_data.empty:
     st.warning(
         "⚠️ No data is available for the selected filters."
@@ -302,7 +261,7 @@ if filtered_data.empty:
 st.success(
     f"Showing {len(filtered_data):,} records"
 )
-# 10. BUSINESS OVERVIEW
+# 9. BUSINESS OVERVIEW
 st.header("📊 Business Overview")
 # Calculate metrics
 total_sales = filtered_data["net_sales"].sum()
@@ -319,7 +278,7 @@ average_rating = (
 )
 # Create four columns
 col1, col2, col3, col4 = st.columns(4)
-# Total Sales in Millions
+# Total Sales
 with col1:
     total_sales_million = total_sales / 1_000_000
     st.metric(
@@ -344,7 +303,7 @@ with col4:
         "⭐ Average Rating",
         f"{average_rating:.2f}"
     )
-# 11. CHART 1 - SALES BY COUNTRY
+# 10. CHART 1 - SALES BY COUNTRY
 if "customer_country" in filtered_data.columns:
     st.subheader("🌍 Sales by Country")
     country_sales = (
@@ -378,7 +337,7 @@ if "customer_country" in filtered_data.columns:
         fig_country,
         use_container_width=True
     )
-# 12. CHART 2 - SALES BY CITY
+# 11. CHART 2 - SALES BY CITY
 if "customer_city" in filtered_data.columns:
     st.subheader("🏙️ Sales by City")
     city_sales = (
@@ -413,7 +372,7 @@ if "customer_city" in filtered_data.columns:
         fig_city,
         use_container_width=True
     )
-# 13. CHART 3 - SALES BY REGION
+# 12. CHART 3 - SALES BY REGION
 if "region" in filtered_data.columns:
     st.subheader("🌎 Sales by Region")
     region_sales = (
@@ -445,7 +404,7 @@ if "region" in filtered_data.columns:
         fig_region,
         use_container_width=True
     )
-# 14. CHART 4 - CUSTOMER SEGMENT
+# 13. CHART 4 - CUSTOMER SEGMENT
 if "customer_segment" in filtered_data.columns:
     st.subheader("👥 Sales by Customer Segment")
     segment_sales = (
@@ -465,7 +424,7 @@ if "customer_segment" in filtered_data.columns:
         fig_segment,
         use_container_width=True
     )
-# 15. CHART 5 - SALES CHANNEL
+# 14. CHART 5 - SALES CHANNEL
 if "sales_channel" in filtered_data.columns:
     st.subheader("🛍️ Sales by Sales Channel")
     channel_sales = (
@@ -493,7 +452,7 @@ if "sales_channel" in filtered_data.columns:
         fig_channel,
         use_container_width=True
     )
-# 16. CHART 6 - PAYMENT METHOD
+# 15. CHART 6 - PAYMENT METHOD
 if "payment_method" in filtered_data.columns:
     st.subheader("💳 Sales by Payment Method")
     payment_sales = (
@@ -521,7 +480,7 @@ if "payment_method" in filtered_data.columns:
         fig_payment,
         use_container_width=True
     )
-# 17. CHART 7 - DISCOUNT VS PROFIT
+# 16. CHART 7 - DISCOUNT VS PROFIT
 if (
     "discount_amount" in filtered_data.columns
     and "profit" in filtered_data.columns
@@ -543,7 +502,7 @@ if (
         fig_discount,
         use_container_width=True
     )
-# 18. CHART 8 - REPEAT CUSTOMER DISTRIBUTION
+# 17. CHART 8 - REPEAT CUSTOMER DISTRIBUTION
 if "is_repeat_customer" in filtered_data.columns:
     st.subheader("🔄 Repeat Customer Distribution")
     repeat_data = (
@@ -577,19 +536,19 @@ if "is_repeat_customer" in filtered_data.columns:
         fig_repeat,
         use_container_width=True
     )
-# 19. STATISTICAL SUMMARY
+# 18. STATISTICAL SUMMARY
 st.header("📋 Statistical Summary")
 st.dataframe(
     filtered_data.describe(),
     use_container_width=True
 )
-# 20. MACHINE LEARNING
+# 19. MACHINE LEARNING
 st.header("🤖 Customer Repeat Purchase Prediction")
 st.write(
     "The Logistic Regression model is trained automatically "
     "to predict whether a customer is a repeat customer."
 )
-# Check required columns
+# Required ML columns
 required_ml_columns = [
     "customer_age",
     "quantity",
@@ -610,7 +569,7 @@ if len(missing_ml_columns) > 0:
         "learning but are missing: "
         + ", ".join(missing_ml_columns)
     )
-else:
+else:    
     # Prepare ML data
     ml_data = filtered_data[
         required_ml_columns
@@ -626,6 +585,7 @@ else:
             "class. Please select broader filters."
         )
     else:
+        # Features and target
         X = ml_data[
             [
                 "customer_age",
@@ -732,7 +692,7 @@ else:
             report_df,
             use_container_width=True
         )
-        # 21. CUSTOMER PREDICTION FORM
+        # CUSTOMER PREDICTION FORM
         st.subheader(
             "🔮 Predict Customer Type"
         )
@@ -740,6 +700,7 @@ else:
             "Enter customer information below to predict "
             "whether the customer is likely to be a repeat customer."
         )
+        # First row
         col1, col2, col3 = st.columns(3)
         with col1:
             prediction_age = st.number_input(
@@ -760,6 +721,7 @@ else:
                 min_value=0.0,
                 value=1000.0
             )
+        # Second row
         col1, col2, col3 = st.columns(3)
         with col1:
             prediction_profit = st.number_input(
@@ -772,10 +734,7 @@ else:
                 min_value=0.0,
                 value=5000.0
             )
-
-
         with col3:
-
             prediction_orders = st.number_input(
                 "Customer Order Count",
                 min_value=1,
@@ -826,7 +785,7 @@ else:
             f"Probability of Repeat Customer: "
             f"{probability[1] * 100:.2f}%"
         )
-# 22. FOOTER
+# 20. FOOTER
 st.markdown("---")
 st.caption(
     "E-Commerce Sales & Customer Analytics Dashboard "
